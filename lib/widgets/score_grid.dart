@@ -61,12 +61,12 @@ class ScoreGridTableState extends State<ScoreGridTable> {
 				const SizedBox(height: 12),
 
 				Container(
-					clipBehavior: Clip.antiAliasWithSaveLayer,
+					clipBehavior: Clip.hardEdge,
 					decoration: BoxDecoration(
 						borderRadius: BorderRadius.circular(28),
 					),	
 					child: Table(
-						border: TableBorder.all(width: 10, color: Color.fromRGBO(42, 42, 42, 1), borderRadius: BorderRadius.circular(24)),
+						border: TableBorder.all(width: 6, color: const Color.fromRGBO(42, 42, 42, 1), borderRadius: BorderRadius.circular(24)),
 						children: List.generate(rows.length, (rowIndex) {
 							String row = rows[rowIndex];
 							return TableRow(
@@ -98,7 +98,18 @@ class ScoreGridTableState extends State<ScoreGridTable> {
 														return;
 													}
 													score.teamID = selectedTeamID;
+													
 													score.item = (score.item + 1) % 3;
+
+													if(!scoreType.contains("cube") && score.item == 2) {
+														score.item++;
+													}
+													if(!scoreType.contains("cone") && score.item == 1) {
+														score.item++;
+													}
+
+													score.item = score.item % 3;
+
 													if(score.item == 0) {
 														score.teamID = 0;
 														score.auto = false;
@@ -129,11 +140,12 @@ class ScoreGridTableState extends State<ScoreGridTable> {
 													Text(
 														"${score.teamID == 0 ? "" : teamNumbers[score.teamID - 1]}\n${score.auto ? "(A)" : ""}",
 														textAlign: TextAlign.center,
-														style: const TextStyle(
+														style: TextStyle(
 															fontWeight: FontWeight.w500,
 															fontSize: 18,
+															color: scoreType == "cone" ? Colors.black : Colors.white,
 															shadows: [
-																Shadow(offset: Offset(0.0, 1.0), blurRadius: 0.0, color: Color.fromRGBO(0, 0, 0, 0.5))
+																Shadow(offset: const Offset(0.0, 2), blurRadius: 0.0, color: (scoreType == "cone" ? Colors.white : Colors.black).withAlpha(192))
 															]
 														)
 													)
