@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:jsonize/jsonize.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:requests/requests.dart';
 import 'package:scoutingapp/pages/picturepage.dart';
 import 'package:scoutingapp/pages/submissionspage.dart';
 import 'package:scoutingapp/pref_util.dart';
@@ -152,9 +153,9 @@ class ScoutingPageState extends State<ScoutingPage> {
 											DrawerButton.from("View past submissions", Icons.bar_chart, () => {
 												Navigator.push(context, MaterialPageRoute(builder: (context) => SubmissionsPage()))
 											}),
-											DrawerButton.from("Take a picture", Icons.camera_alt, () => {
-												Navigator.push(context, MaterialPageRoute(builder: (context) => const PicturePage()))
-											}),
+											// DrawerButton.from("Take a picture", Icons.camera_alt, () => {
+											// 	Navigator.push(context, MaterialPageRoute(builder: (context) => const PicturePage()))
+											// }),
 										],
 									),
 									const Divider(thickness: 0.25, endIndent: 16, indent: 16),
@@ -209,9 +210,19 @@ class ScoutingPageState extends State<ScoutingPage> {
 															key = UniqueKey();
 														});
 														ScaffoldMessenger.of(context).showSnackBar(
-															const SnackBar(
-																content:  Text("Match submitted"),
-																duration: Duration(milliseconds: 1500),
+															SnackBar(
+																content: Row(
+																	mainAxisAlignment: MainAxisAlignment.center,
+																	children: const [
+																		Icon(Icons.archive),
+																		SizedBox(width: 8),
+																		Text("Match submitted", style: TextStyle(color: Colors.white))
+																	],
+																),
+																duration: const Duration(milliseconds: 1500),
+																behavior: SnackBarBehavior.floating,
+																padding: const EdgeInsets.all(16),
+																backgroundColor: Colors.black,
 															)
 														);
 													},
@@ -292,16 +303,16 @@ class ScoutingPageState extends State<ScoutingPage> {
 																	Theme( // Red/Blue alliance switch
 																		data: ThemeData(
 																			colorScheme: Theme.of(context).colorScheme.copyWith(
-																				outline: states.alliance == "blue" ? Colors.blue : Colors.red,
-																				secondaryContainer: states.alliance == "blue" ? Colors.blue : Colors.red,
-																				primary: states.alliance == "blue" ? Colors.red.withAlpha(128) : Colors.blue.withAlpha(128),
+																				outline: ([Colors.white30, Colors.red, Colors.blue])[(["none", "red", "blue"].indexOf(states.alliance))],
+																				secondaryContainer: ([Colors.white30, Colors.red, Colors.blue])[(["none", "red", "blue"].indexOf(states.alliance))],
+																				primary: ([Colors.white30, Colors.blue, Colors.red])[(["none", "red", "blue"].indexOf(states.alliance))]
 																			)
 																		),
 																		child: Column(
 																			children: [
 																				const Text("Alliance"),
 																				SegmentedButton(
-																					selected: {states.alliance == "blue" ? 1 : 0},
+																					selected: {["red", "blue"].indexOf(states.alliance)},
 																					onSelectionChanged: (selection) {
 																						setState(() {
 																							states.alliance = selection.first == 1 ? "blue" : "red";
@@ -323,29 +334,6 @@ class ScoutingPageState extends State<ScoutingPage> {
 																			]
 																		)
 																	),
-
-																	
-																	// Column(
-																	// 	children: [
-																	// 		Text(states.blueAlliance ? "Blue" : "Red"),
-																	// 		Theme(
-																	// 			data: Theme.of(context).copyWith(
-																	// 				colorScheme: Theme.of(context).colorScheme.copyWith(outline: Colors.transparent)
-																	// 			),
-																	// 			child: Switch(
-																	// 				onChanged: (value) {
-																	// 					setState(() {
-																	// 						states.blueAlliance = value;
-																	// 					});
-																	// 				},
-																	// 				value: states.blueAlliance,
-																	// 				activeColor: Colors.blue,
-																	// 				inactiveThumbColor: Colors.red,
-																	// 				inactiveTrackColor: Colors.red.withAlpha(128),
-																	// 			)
-																	// 		)
-																	// 	],
-																	// )
 																],
 															),
 															
@@ -355,21 +343,63 @@ class ScoutingPageState extends State<ScoutingPage> {
 
 															const SizedBox(height: 24),
 
-															// TeamSection(teamID: 2, formData: states, updateFunction: () => updateDataState(states)),
 															team2 ?? Text(""),
 
 															const SizedBox(height: 24),
 															
-															// TeamSection(teamID: 3, formData: states, updateFunction: () => updateDataState(states)),
 															team3 ?? Text(""),
 														],
 													)
 												),
 												FormSection(
 													title: "Scoring",
-													child: ScoreGridTable(
-														formData: states,
-														updateFunction: () => updateDataState(states),
+													child: Column(
+														children: [
+															ScoreGridTable(
+																formData: states,
+																updateFunction: () => updateDataState(states),
+															),
+															const SizedBox(height: 24),
+															Column(
+																children: const [
+																	Icon(Icons.info_outline_rounded),
+																	SizedBox(height: 12),
+																	Text("Tap a team to select it for scoring"),
+																	SizedBox(height: 12),
+																	Text("Tap a score box to score for the selected team"),
+																	SizedBox(height: 12),
+																	Text("Long press a score box to mark it as autonomous (A)"),
+																],
+															),
+															const SizedBox(height: 18),
+															Divider(color: Theme.of(context).colorScheme.primary),
+															const SizedBox(height: 18),
+															SegmentedButton(
+																style: ButtonStyle(padding: MaterialStatePropertyAll(EdgeInsets.fromLTRB(16, 8, 16, 8))),
+																selected: {["defeat", "tie", "victory"].indexOf(states.allianceWin)},
+																onSelectionChanged: (selection) {
+																	setState(() { states.allianceWin = (["defeat", "tie", "victory"])[selection.first]; });
+																},
+																segments: const [
+																	ButtonSegment(
+																		value: 0,
+																		icon: Icon(Icons.thumb_down_rounded),
+																		label: Text("Defeat")
+																	),
+																	ButtonSegment(
+																		value: 1,
+																		icon: Icon(Icons.thumbs_up_down_rounded),
+																		label: Text("Tie")
+																	),
+																	ButtonSegment(
+																		value: 2,
+																		icon: Icon(Icons.thumb_up_rounded),
+																		label: Text("Victory")
+																	)
+																],
+															),
+															const SizedBox(height: 12)
+														],
 													)
 												)
 											],

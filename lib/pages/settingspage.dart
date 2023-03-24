@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+class Settings {
+	static String serverAddress = "";
+}
+
 class SettingsPage extends StatelessWidget {
 	const SettingsPage({super.key});
 	
@@ -10,10 +14,13 @@ class SettingsPage extends StatelessWidget {
 
 			body: ListView(
 				padding: const EdgeInsets.all(8),
-				children: const [
+				children: [
 					ListTile(title: Text("Administration")),
 					TextField(
-						decoration: InputDecoration(
+						onChanged: (value) {
+							Settings.serverAddress = value;
+						},
+						decoration: const InputDecoration(
 							border: OutlineInputBorder(),
 							prefixIcon: Icon(Icons.computer),
 							label: Text("Server address")

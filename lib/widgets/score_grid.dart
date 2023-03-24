@@ -4,7 +4,8 @@ import 'package:scoutingapp/scoutingform_states.dart';
 class ScoreGridTable extends StatefulWidget {
 	final ScoutingFormData formData;
 	final Function updateFunction;
-	const ScoreGridTable({super.key, required this.formData, required this.updateFunction});
+	final bool showSwitcher;
+	const ScoreGridTable({super.key, required this.formData, required this.updateFunction, this.showSwitcher = true});
 
 	@override
 	State<StatefulWidget> createState() => ScoreGridTableState();
@@ -27,6 +28,7 @@ class ScoreGridTableState extends State<ScoreGridTable> {
 		return Column(
 			crossAxisAlignment: CrossAxisAlignment.stretch,
 			children: [
+				if(widget.showSwitcher)
 				SegmentedButton( // Team selector
 					showSelectedIcon: false,
 					selected: {selectedTeamID},
@@ -87,70 +89,84 @@ class ScoreGridTableState extends State<ScoreGridTable> {
 												stops: const [0.495, 0.505]
 											) : null
 										),
-										child: InkWell(
-											onTap: () {
-												setState(() {
-													if(selectedTeamID == 0) return;
-													if(score.teamID != selectedTeamID && score.item != 0) {
-														score.teamID = 0;
-														score.item = 0;
-														score.auto = false;
-														return;
-													}
-													score.teamID = selectedTeamID;
-													
-													score.item = (score.item + 1) % 3;
+										child: Material(
+											child: Ink(
+												decoration: BoxDecoration(
+													color: scoreType == "cone" ? Colors.yellow.shade200 : (scoreType == "cube" ? Colors.purple.shade200 : null),
+													gradient: scoreType == "conecube" ? LinearGradient(
+														begin: Alignment.bottomRight,
+														end: Alignment.topLeft,
+														colors: [ Colors.yellow.shade200, Colors.purple.shade200 ],
+														stops: const [0.495, 0.505]
+													) : null
+												),
+												child: InkWell(
+													onTap: () {
+														setState(() {
+															if(selectedTeamID == 0) return;
+															if(score.teamID != selectedTeamID && score.item != 0) {
+																score.teamID = 0;
+																score.item = 0;
+																score.auto = false;
+																return;
+															}
+															score.teamID = selectedTeamID;
+															
+															score.item = (score.item + 1) % 3;
 
-													if(!scoreType.contains("cube") && score.item == 2) {
-														score.item++;
-													}
-													if(!scoreType.contains("cone") && score.item == 1) {
-														score.item++;
-													}
+															if(!scoreType.contains("cube") && score.item == 2) {
+																score.item++;
+															}
+															if(!scoreType.contains("cone") && score.item == 1) {
+																score.item++;
+															}
 
-													score.item = score.item % 3;
+															score.item = score.item % 3;
 
-													if(score.item == 0) {
-														score.teamID = 0;
-														score.auto = false;
-													}
-													widget.updateFunction();
-												});
-											},
-											onLongPress: () {
-												setState(() {
-													if(score.teamID != 0) score.auto = !score.auto;
-													widget.updateFunction();
-												});
-											},
-											child: Stack(
-												alignment: Alignment.center,
-												children: [
-													Image.asset("assets/img/blank.png"),
-													AspectRatio(
-														aspectRatio: 1,
-														child: FractionallySizedBox(
-															widthFactor: 0.5, heightFactor: 0.5,
-															child: score.item.abs() == 1? Image.asset("assets/img/cone.png", color: Colors.amber)
-																: score.item.abs() == 2? Image.asset("assets/img/cube.png", color: Colors.deepPurple[700])
-																: Image.asset("assets/img/blank.png"),
-														),
-													),
-													
-													Text(
-														"${score.teamID == 0 ? "" : teamNumbers[score.teamID - 1]}\n${score.auto ? "(A)" : ""}",
-														textAlign: TextAlign.center,
-														style: TextStyle(
-															fontWeight: FontWeight.w500,
-															fontSize: 18,
-															color: scoreType == "cone" ? Colors.black : Colors.white,
-															shadows: [
-																Shadow(offset: const Offset(0.0, 2), blurRadius: 0.0, color: (scoreType == "cone" ? Colors.white : Colors.black).withAlpha(192))
-															]
-														)
+															if(score.item == 0) {
+																score.teamID = 0;
+																score.auto = false;
+															}
+															widget.updateFunction();
+														});
+													},
+													onLongPress: () {
+														setState(() {
+															if(score.teamID != 0) score.auto = !score.auto;
+															widget.updateFunction();
+														});
+													},
+													child: Stack(
+														alignment: Alignment.center,
+														children: [
+															Image.asset("assets/img/blank.png"),
+															AspectRatio(
+																aspectRatio: 1,
+																child: FractionallySizedBox(
+																	widthFactor: 0.5, heightFactor: 0.5,
+																	child: score.item.abs() == 1? Image.asset("assets/img/cone.png", color: Colors.amber)
+																		: score.item.abs() == 2? Image.asset("assets/img/cube.png", color: Colors.deepPurple[700])
+																		: Image.asset("assets/img/blank.png"),
+																),
+															),
+															
+															Text(
+																"${score.teamID == 0 ? "" : teamNumbers[score.teamID - 1]}\n${score.auto ? "(A)" : ""}",
+																textAlign: TextAlign.center,
+																style: TextStyle(
+																	fontWeight: FontWeight.w500,
+																	fontSize: 18,
+																	color: scoreType == "cone" ? Colors.black : Colors.white,
+																	shadows: [
+																		Shadow(offset: const Offset(0.0, 2), blurRadius: 0.0, color: (scoreType == "cone" ? Colors.white : Colors.black).withAlpha(192))
+																	]
+																)
+															)
+														],
 													)
-												],
+												)
 											)
+											
 										)
 									);
 								})

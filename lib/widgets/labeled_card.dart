@@ -15,8 +15,8 @@ class LabeledCard extends StatelessWidget {
 			shape: RoundedRectangleBorder(
 				borderRadius: BorderRadius.circular(12),
 				side: outlined ? BorderSide(
-					width: 3,
-					color: Theme.of(context).colorScheme.background.withAlpha(64)
+					width: 4,
+					color: Theme.of(context).colorScheme.background.withAlpha(128)
 				) : BorderSide.none,
 			),
 			child: Stack(
