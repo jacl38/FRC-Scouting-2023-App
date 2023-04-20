@@ -35,7 +35,7 @@ class SubmissionsPageState extends State<SubmissionsPage> {
 							context: context,
 							builder: (context) {
 								return AlertDialog(
-									title: Text("Delete ${selectedSubmissions.length} submissions?"),
+									title: Text("Delete ${selectedSubmissions.length} submission${selectedSubmissions.length == 1 ? "" : "s"}?"),
 									actions: [
 										TextButton(
 											child: Text("Cancel"),
@@ -81,8 +81,17 @@ class SubmissionsPageState extends State<SubmissionsPage> {
 									icon: const Icon(Icons.send_to_mobile),
 									label: const Text("Upload Submissions"),
 									style: const ButtonStyle(padding: MaterialStatePropertyAll(EdgeInsets.all(12))),
-									onPressed: () {
-										submitMatch(getSubmissions().map((formData) => formData.toXml().toXmlString()).toList(), Settings.serverAddress);
+									onPressed: () async {
+										var result = submitMatch(
+											getSubmissions().map((formData) => 
+												formData.toXml().toXmlString()).toList(),
+											Settings.serverAddress
+										);
+										if(await result) {
+											print("good");
+										} else {
+											print("bad");
+										}
 										// showDialog(
 										// 	builder: (BuildContext context) {
 										// 		return const AlertDialog(

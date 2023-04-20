@@ -17,13 +17,14 @@ class SettingsPage extends StatelessWidget {
 				children: [
 					ListTile(title: Text("Administration")),
 					TextField(
+						controller: TextEditingController()..text = Settings.serverAddress,
 						onChanged: (value) {
 							Settings.serverAddress = value;
 						},
 						decoration: const InputDecoration(
 							border: OutlineInputBorder(),
 							prefixIcon: Icon(Icons.computer),
-							label: Text("Server address")
+							label: Text("Server address"),
 						),
 					)
 				],

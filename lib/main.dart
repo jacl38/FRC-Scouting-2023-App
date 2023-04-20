@@ -278,6 +278,44 @@ class ScoutingPageState extends State<ScoutingPage> {
 											crossAxisAlignment: CrossAxisAlignment.stretch,
 											children: [
 												const SizedBox(height: 12),
+												Container(
+													padding: EdgeInsets.fromLTRB(32, 0, 32, 0),
+													child: OutlinedButton.icon(
+														onPressed: () {
+															showDialog(
+																context: context,
+																builder: (context) {
+																	return AlertDialog(
+																		title: Text("Clear the entire form?"),
+																		content: Text("This can't be undone"),
+																		actions: [
+																			TextButton(
+																				child: Text("Cancel"),
+																				onPressed: () {
+																					Navigator.of(context).pop();
+																				},
+																			),
+																			TextButton(
+																				child: Text("Clear Data"),
+																				onPressed: () {
+																					Navigator.of(context).pop();
+																					states = ScoutingFormData();
+																					Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScoutingPage()));
+																				},
+																			),
+																		],
+																	);
+																}
+															);
+														},
+														icon: Icon(Icons.recycling),
+														label: Text("Clear form data"),
+														style: ButtonStyle(
+															side: MaterialStatePropertyAll(BorderSide(width: 1, color: Colors.red))
+														)
+													),
+												),
+												const SizedBox(height: 12),
 												FormSection(
 													title: "Match Info",
 													child: Column(
